@@ -22,3 +22,86 @@ Result :
 Documentation Source:
 - [SSL Configuration](https://www.youtube.com/watch?v=degTCVeAvLs)
 - [APISIX Documentation] (https://apisix.apache.org/docs/apisix/)
+
+## 15 August 2026
+For this day, the report will be focus on sum general plugins.
+### 1st Step to Set Plugins in APISIX
+The most important step. If we don't do it, then plugin might not be able to be configured. 
+#### Set config.yaml
+Used as a system and core configuration. Plugins installation was also set in here. Here are additional setting from me for today
+![Config Yaml August 15th](./documentation/20260815/config_yaml.png)
+
+#### Route Plugin Configuration
+Plugin configuration directly in a route config
+```bash
+curl http://127.0.0.1:9180/apisix/admin/routes/<id> -H "X-API-KEY: $admin_key" -X PUT -d '
+{ ... }
+'
+# <id> is the identifier for each routes and its plugins configs
+```
+
+#### Metadata Plugin Configuration
+Specific plugin configuration
+```bash
+curl http://127.0.0.1:9180/apisix/admin/plugin_metadata/<plugin-name> -H "X-API-KEY: $admin_key" -X PUT -d '
+{ ... }'
+```
+
+### Public API
+It's an important plugin. If not installed it, then it will be a problem for some plugin. **Why?** Because we need it to make sure some our plugins configuration to be able reached by client. It even stated on some plugins like `Batch Requests`
+- Set Public API
+```bash
+curl http://127.0.0.1:9180/apisix/admin/routes/<id> -H "X-API-KEY: $admin_key" -X PUT -d '
+{
+    "uri": <public-endpoint>,
+    "plugins": {
+        "public-api": {
+            "uri": <internal-route>
+            # if this uri is not set, then it will be set same as public endpoint
+        }
+    }
+}
+```
+- Batch Requests (Before)
+![Before Set Public API](./documentation/20260815/batch-requests-before.png)
+- Batch Requests (After)
+![After Set Public API](documentation/20260815/public-api-after.png)
+
+### Batch Requests
+The Batch Requests is a plugin that used for requesting some data at the same time. It's so usefull for client. Because of it, client doesn't have to open many HTTP Requests, reduce its latency, and handshake TLS. However, in APISIX side, it's still receiving all requests. It can also be more heavier.
+- Config
+```bash
+curl http://127.0.0.1:9180/apisix/admin/plugin_metadata/batch-requests -H "X-API-KEY: $admin_key" -X PUT -d '
+{
+    "max_body_size": 4194304
+}'
+# to publish publicly
+curl http://127.0.0.1:9180/apisix/admin/routes/br -H "X-API-KEY: $admin_key" -X PUT -d '
+{
+    "uri": "/apisix/batch-requests",
+    "plugins": {
+        "public-api": {}
+    }
+}'
+```
+- Result
+![Batch Requests Test](documentation/20260815/batch-requests-test.png)
+
+[Source documentation](https://apisix.apache.org/docs/apisix/plugins/batch-requests/)
+### Redirect
+As the name, the focus of this plugin is for redirecting. But, this is more than regullar redirect. It can redirect from http to https, can redirecting to different domain, and can even set read regex if client type or anything. 
+
+- Before Redirect
+![Result Before Redirect](./documentation/20260815/redirect-before.png)
+- After Redirect
+![Result After Redirect](./documentation/20260815/redirect-after.png)
+
+[Source documentation](https://apisix.apache.org/docs/apisix/plugins/redirect/)
+
+### Echo
+
+Similar to the `echo` command in CLI, this plugin helps return additional information in the response when making a request.
+
+![Echo Result](./documentation/20260815/echo-result.png)
+
+[Source documentation](https://apisix.apache.org/docs/apisix/plugins/echo/)
