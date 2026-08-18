@@ -105,3 +105,42 @@ Similar to the `echo` command in CLI, this plugin helps return additional inform
 ![Echo Result](./documentation/20260815/echo-result.png)
 
 [Source documentation](https://apisix.apache.org/docs/apisix/plugins/echo/)
+
+## 18th August 2026
+Continue the previous progress. Still focusing in plugins review. The main focus now is Real-IP, Response-Rewrite, and Server info. Make sure to installed it first in `config.yml`
+
+### Real-IP && Response-Rewrite
+Real-IP is used to create same IP address for clients to identify them. With it, we can now know from which client the Requests came. **Why?** Because there is cases when we needed to really know them. 
+
+Response Rewrite is to edit or create additional information from response. **WHY WITH REAL-IP?** Because we wanna know is the Real-IP really works or not. If we didn't use it, then we can not possibly know it's really change the IP or not. For that, we can use this plugin for debugging.
+
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes/real-ip-route" \
+  -X PATCH \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "plugins": {
+      "real-ip": {
+        "source": "arg_realip",
+        "trusted_addresses": [
+          <legal-proxy-ip-to-inform>
+        ]
+      },
+      "response-rewrite": {
+        "headers": {
+          "remote_addr": "$remote_addr",
+          "remote_port": "$remote_port"
+        }
+      }
+    }
+  }'
+#   Remote addr and port is for revealing the Real-IP
+
+```
+- Config
+![Real IP Debug Config](./documentation/20260818/real-ip-debug-config.png)
+- Testing
+![Real IP Debug Test](./documentation/20260818/real-ip-debug-test.png)
+
+### Server Info
+Used to periodically reports basic server information to etcd. The most importantly, to recap it. Foe the rest, will be informed later.
