@@ -144,3 +144,78 @@ curl "http://127.0.0.1:9180/apisix/admin/routes/real-ip-route" \
 
 ### Server Info
 Used to periodically reports basic server information to etcd. The most importantly, to recap it. Foe the rest, will be informed later.
+
+## 19th August 2026
+More review of plugins. The focus are server-info, gzip, proxy-rewrite, grpc-transcode, and grpc-web
+
+### Server Info
+#### The configuration
+1. Set it in config.yaml
+![config.yaml Setting](./documentation/20260819/server-info-config-1.png)
+2. Activate control API in APISIX
+![config.yaml APISIX Setting](./documentation/20260819/server-info-config-2.png)
+
+#### Test Result
+![Server Info Succes Result](./documentation/20260819/server-info-result.png)
+### Gzip
+It's used to minimize a big responses. Same as, zip command in file manager. However, it's oriented in response and client should have to set `Accept-Encoding` header firts to use it.
+
+#### Configuration
+![Gzip Configuration](./documentation/20260819/gzip-configuration.png)
+#### Test Result
+- Before
+Only base response
+![Before Gzip](./documentation/20260819/gzip-before.png)
+- After
+Can change it to zip if it's too big
+![After Gzip](./documentation/20260819/gzip-after.png)
+
+### Proxy Rewrite
+It's a plugin to rewrite requests that APISIX forwards to Upstream services. With it, we can finally access the certain path or location from Upstream services. We can also modify the methods, request destination Upstream addresses, request headers, and more.
+
+#### Configuration
+![Proxy Rewrite Configuration](./documentation/20260819/gzip-configuration.png)
+#### Test Result
+- Before
+Only access the default location of nginx
+![Before Proxy Rewrite](./documentation/20260819/proxy-rewrite-before.png)
+- After
+Access the specific location of nginx
+![After Proxy Rewrite](./documentation/20260819/gzip-before.png)
+
+### gRPC
+gRPC stands for Google Remote Procedure Call. Was created in 2015 with plan to change or be an alternative from traditional REST, especially to communicate between servers (backend-to-backend). Very usefull in microservices.
+
+#### Short gRPC Project
+1. gRPC Example
+Run it to create gRPC example project
+```bash
+docker run -d \
+  --name grpc-example-server \
+  -p 50051:50051 \
+  api7/grpc-server-example:1.0.2
+```
+2. gRPCBinServer
+Start a grpcbinserver
+```
+docker run -d \
+  --name grpcbin \
+  -p 9000:9000 \
+  moul/grpcbin
+```
+
+#### gRPC Transcode
+The `grpc-transcode` Plugin transforms between HTTP requests and gRPC requests, as well as their corresponding responses.
+
+With this Plugin enabled, APISIX accepts an HTTP request from the client, transcodes and forwards it to an upstream gRPC service. When APISIX receives the gRPC response, it will transform the response back to an HTTP response and send it to the client.
+
+##### Configuration
+1. Create proto resource
+![gRPC Proto](./documentation/20260819/grpc-proto.png)
+2. Create `grpc-transcode` route
+![gRPC Transcode](./documentation/20260819/grpc-transcode-route.png)
+##### Testing
+![gRPC Transcode Result](./documentation/20260819/grpc-transcode-result.png)
+
+#### gRPC Web
+gRPC is a high-performance RPC framework based on HTTP/2 and Protocol Buffers, but it is not natively supported by browsers. gRPC-Web defines a browser-compatible protocol for sending gRPC requests over HTTP/1.1 or HTTP/2.

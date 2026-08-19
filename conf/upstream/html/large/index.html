@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APISIX Gzip Compression Test Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2, h3 { color: #0056b3; }
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .card {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fafafa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>APISIX Gzip Plugin Test Payload</h1>
+        <p>Document size optimization and compression benchmark page for Apache APISIX gateway testing.</p>
+        
+        <!-- SECTION 1 -->
+        <section>
+            <h2>1. Lorem Ipsum Large Block</h2>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            <p>Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam dui sem, fermentum vitae, sagittis id, malesuada in, quam. Proin quam nisl, tincidunt et, mattis eget, convallis nec, purus. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla posuere.</p>
+        </section>
+
+        <!-- REPETITIVE DATA GRID FOR HIGH COMPRESSION RATIO -->
+        <section>
+            <h2>2. Generated Data Grid (Massive Content)</h2>
+            <div class="card-grid">
+                <!-- Data Blocks -->
+                <div class="card">
+                    <h3>Item Node #001</h3>
+                    <p>Status: ACTIVE | Code: 200 | Payload Target: APISIX Proxy Gateway</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac magna justo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+                </div>
+                <div class="card">
+                    <h3>Item Node #002</h3>
+                    <p>Status: ACTIVE | Code: 200 | Payload Target: APISIX Proxy Gateway</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac magna justo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+                </div>
+                <div class="card">
+                    <h3>Item Node #003</h3>
+                    <p>Status: ACTIVE | Code: 200 | Payload Target: APISIX Proxy Gateway</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac magna justo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+                </div>
+                <div class="card">
+                    <h3>Item Node #004</h3>
+                    <p>Status: ACTIVE | Code: 200 | Payload Target: APISIX Proxy Gateway</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac magna justo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+                </div>
+                <div class="card">
+                    <h3>Item Node #005</h3>
+                    <p>Status: ACTIVE | Code: 200 | Payload Target: APISIX Proxy Gateway</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac magna justo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+                </div>
+                <div class="card">
+                    <h3>Item Node #006</h3>
+                    <p>Status: ACTIVE | Code: 200 | Payload Target: APISIX Proxy Gateway</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac magna justo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+                </div>
+                <div class="card">
+                    <h3>Item Node #007</h3>
+                    <p>Status: ACTIVE | Code: 200 | Payload Target: APISIX Proxy Gateway</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac magna justo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+                </div>
+                <div class="card">
+                    <h3>Item Node #008</h3>
+                    <p>Status: ACTIVE | Code: 200 | Payload Target: APISIX Proxy Gateway</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac magna justo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+                </div>
+                <div class="card">
+                    <h3>Item Node #009</h3>
+                    <p>Status: ACTIVE | Code: 200 | Payload Target: APISIX Proxy Gateway</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac magna justo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+                </div>
+                <div class="card">
+                    <h3>Item Node #010</h3>
+                    <p>Status: ACTIVE | Code: 200 | Payload Target: APISIX Proxy Gateway</p>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent ac magna justo. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- LARGE DUMMY TEXT BLOCK -->
+        <section>
+            <h2>3. Extended Log Stream Payload</h2>
+            <pre>
+2026-08-19T10:00:00Z [INFO] APISIX Gateway: Route matched successfully. Route ID: test-gzip-route
+2026-08-19T10:00:01Z [DEBUG] Plugin Gzip: Compression enabled. Minimum response length threshold exceeded.
+2026-08-19T10:00:02Z [INFO] Upstream Response Received: Content-Type: text/html; charset=utf-8
+2026-08-19T10:00:03Z [DEBUG] Gzip processing: Compressing response body...
+2026-08-19T10:00:04Z [INFO] APISIX Gateway: Route matched successfully. Route ID: test-gzip-route
+2026-08-19T10:00:05Z [DEBUG] Plugin Gzip: Compression enabled. Minimum response length threshold exceeded.
+2026-08-19T10:00:06Z [INFO] Upstream Response Received: Content-Type: text/html; charset=utf-8
+2026-08-19T10:00:07Z [DEBUG] Gzip processing: Compressing response body...
+2026-08-19T10:00:08Z [INFO] APISIX Gateway: Route matched successfully. Route ID: test-gzip-route
+2026-08-19T10:00:09Z [DEBUG] Plugin Gzip: Compression enabled. Minimum response length threshold exceeded.
+2026-08-19T10:00:10Z [INFO] Upstream Response Received: Content-Type: text/html; charset=utf-8
+2026-08-19T10:00:11Z [DEBUG] Gzip processing: Compressing response body...
+2026-08-19T10:00:12Z [INFO] APISIX Gateway: Route matched successfully. Route ID: test-gzip-route
+2026-08-19T10:00:13Z [DEBUG] Plugin Gzip: Compression enabled. Minimum response length threshold exceeded.
+2026-08-19T10:00:14Z [INFO] Upstream Response Received: Content-Type: text/html; charset=utf-8
+2026-08-19T10:00:15Z [DEBUG] Gzip processing: Compressing response body...
+            </pre>
+        </section>
+    </div>
+</body>
+</html>

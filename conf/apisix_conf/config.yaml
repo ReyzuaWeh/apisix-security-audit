@@ -18,7 +18,7 @@
 apisix:
   node_listen: 9080              # APISIX listening port
   enable_ipv6: false
-
+  # to acces server-info plugin, you need to enable control API first.
   enable_control: true
   control:
     ip: "0.0.0.0"
@@ -49,6 +49,8 @@ plugin_attr:
     export_addr:
       ip: "0.0.0.0"
       port: 9091
+  server-info:
+    report_ttl: 60
 plugins:
   - batch-requests
   - public-api
@@ -58,3 +60,8 @@ plugins:
   - real-ip
   - server-info
   - response-rewrite
+
+  - gzip
+  - proxy-rewrite
+  - grpc-transcode
+  - grpc-web

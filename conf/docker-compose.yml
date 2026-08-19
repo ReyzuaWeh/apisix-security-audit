@@ -55,6 +55,7 @@ services:
     restart: always
     volumes:
       - ./upstream/web1.conf:/etc/nginx/nginx.conf
+      - ./upstream/html/:/usr/share/nginx/html/
     ports:
       - "9081:80/tcp"
     environment:
