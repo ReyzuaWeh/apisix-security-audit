@@ -221,7 +221,7 @@ With this Plugin enabled, APISIX accepts an HTTP request from the client, transc
 gRPC is a high-performance RPC framework based on HTTP/2 and Protocol Buffers, but it is not natively supported by browsers. gRPC-Web defines at browser-compatible protocol for sending gRPC requests over HTTP/1.1 or HTTP/2.
 
 ## 20th August 2026
-Continue reviewing plugins. The main focus are : gRPC Web, Fault Injection, Mocking, Cors, URI blocker, IP Restriction, and UA Restriction.
+Continue reviewing plugins. The main focus are : gRPC Web, Fault Injection, Mocking, Security Plugins, abd Traffic Plugins.
 
 ### gRPC Web
 #### Configuration
@@ -273,63 +273,7 @@ npm init -y
 npm install xhr2 grpc-web google-protobuf
 ```
 - Create `client.js`
-Create it in the same directory with hello.proto
-
-```bash
-const XMLHttpRequest = require('xhr2');
-const { HelloServiceClient } = require('./hello_grpc_web_pb');
-const { HelloRequest } = require('./hello_pb');
-
-global.XMLHttpRequest = XMLHttpRequest;
-
-function sayHello(){
-  const client = new HelloServiceClient('http://127.0.0.1:9080/grpc/web', null, {
-    format: 'text',
-  });
-  const req = new HelloRequest();
-  req.setGreeting('jack');
-
-  const call = client.sayHello(req, {}, (err, resp) => {
-    if (err) {
-      console.error('grpc error:', err.code, err.message);
-    } else {
-      console.log('reply:', resp.getReply());
-    }
-  });
-
-  call.on('metadata', (metadata) => {
-    console.log('Response headers:', metadata);
-  });
-}
-
-function lotsOfReplies() {
-  const client = new HelloServiceClient('http://127.0.0.1:9080/grpc/web', null, {
-    format: 'text',
-  });
-  const req = new HelloRequest();
-  req.setGreeting('rep');
-  const stream = client.lotsOfReplies(req, {});
-
-  stream.on('metadata', (metadata) => {
-    console.log('Response headers:', metadata);
-  });
-
-  stream.on('data', (response) => {
-    console.log('Reply:', response.getReply());
-  });
-
-  stream.on('end', () => {
-    console.log('Stream ended');
-  });
-
-  stream.on('error', (err) => {
-    console.error('Error:', err);
-  });
-}
-
-lotsOfReplies()
-sayHello()
-```
+Create it in the same directory with hello.proto. You can copy it from `conf/proto_conf/client.js`
 
 #### Testing
 1. Make sure gRPC bin Active
@@ -652,3 +596,256 @@ Non Forbidden Agent
 Forbidden Agent
 ![Forbidden Agent Result](./documentation/20260820/ua-res-block.png)
 
+#### Referer Restriction
+The `referer-restriction` Plugin can be used to restrict access to a Service or a Route by whitelisting/blacklisting the `Referer` request header.
+- Configuration
+```bash
+curl http://127.0.0.1:9180/apisix/admin/routes/1 -H "X-API-KEY: $admin_key" -X PUT -d '
+{
+    "uri": "/index.html",
+    "upstream": {
+        "type": "roundrobin",
+        "nodes": {
+            "web1:80": 1
+        }
+    },
+    "plugins": {
+        "referer-restriction": {
+            "bypass_missing": true,
+            "whitelist": [
+                "xx.com",
+                "*.xx.com"
+            ]
+        }
+    }
+}'
+```
+- Test
+Allowed Referer
+![Allowed Result](./documentation/20260820/referer-allow.png)
+
+Not-Allowed Referer
+![Not-Allowed Result](./documentation/20260820/referer-not-allow.png)
+
+#### Consumer Restriction
+The `consumer-restriction` Plugin enables access controls based on Consumer name, Route ID, Service ID, or Consumer Group ID. The concept of this plugin is the same as *user authentication*. It will be perfect if you combine it with auth plugins.
+
+- Configuration
+1. Create a consumer
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/consumers" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "username": "<consumer-name>"
+  }'
+```
+2. Create consumer's auth
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/consumers/JohnDoe/credentials" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "<consumer-auth-cred>",
+    "plugins": {
+      "key-auth": {
+        "key": "<consumer-key>"
+      }
+    }
+  }'
+```
+
+3. Create a Route with Key Auth
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT   -H "X-API-KEY: ${admin_key}"   -d '{
+    "id": "consumer-restricted-route",
+    "uri": "/get-consume",
+    "plugins": {
+      "key-auth": {},
+      "consumer-restriction": {
+        "whitelist": [<consumer-username>]
+      }
+    },
+    "upstream" : {
+      "nodes": {
+        "httpbin.org":1
+      }
+    }
+  }'
+```
+
+- Test
+Allowed Consumer
+![Allowed Consumer](./documentation/20260820/consumer-allow.png)
+
+Not-Allowed Consumer
+![Not-Allowed Consumer](./documentation/20260820/consumer-not-allow.png)
+
+#### CSRF 
+The `csrf` Plugin can be used to protect your API against CSRF attacks using the Double Submit Cookie method.
+
+This Plugin considers the GET, HEAD and OPTIONS methods to be safe operations (safe-methods) and such requests are not checked for interception by an attacker. Other methods are termed as unsafe-methods
+
+- Configuration
+```bash
+curl -i http://127.0.0.1:9180/apisix/admin/routes/1 -H "X-API-KEY: $admin_key" -X PUT-d '
+{
+  "uri": "/<uri>",
+  "plugins": {
+    "csrf": {
+      "key": "<csrf-secret-key>"
+    }
+  },
+  "upstream": {
+    "type": "roundrobin",
+    "nodes": {
+      "<upstream-server>": 1
+    }
+  }
+}'
+```
+- Get CSRF
+```bash
+curl -i http://127.0.0.1:9080/<uri>
+```
+![Get CSRF](./documentation/20260820/csrf-get.png)
+
+- Test
+![No CSRF Post](./documentation/20260820/csrf-no-csrf.png)
+
+
+### Traffic Plugins
+Plugin that focusing on request access gateway. Not like security, it's more like to **control** how it should behave.
+
+#### Limit Req
+The `limit-req` Plugin uses the leaky bucket algorithm to rate limit the number of the requests and allow for throttling. Supporting local rate and redis-based rate limiting. It can also be combined with other plugins.
+- Simple Configuration
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '
+  {
+    "id": "<id-route>",
+    "uri": "/<uri>",
+    "plugins": {
+      "limit-req": {
+        "rate": 1,
+        "burst": 0,
+        "key": "remote_addr",
+        "key_type": "var",
+        "rejected_code": 429,
+        "policy": "local",
+        "nodelay": true
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "<upstream-server>": 1
+      }
+    }
+  }'
+```
+- Result
+![Req Limit Result](./documentation/20260820/req-limit-result.png)
+
+#### Limit Conn
+The `limit-conn` plugin limits the rate of requests by the number of concurrent connections. Requests exceeding the threshold will be delayed or rejected based on the configuration, ensuring controlled resource usage and preventing overload.
+
+- Configuration
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "<id-route>",
+    "uri": "/<uri>",
+    "plugins": {
+      "limit-conn": {
+        "conn": 2,
+        "burst": 1,
+        "default_conn_delay": 0.1,
+        "key_type": "var",
+        "key": "remote_addr",
+        "policy": "local",
+        "rejected_code": 429
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "<upstream-server>": 1
+      }
+    }
+  }'
+```
+- Result
+![Limit Conn Result](./documentation/20260820/limit-conn-result.png)
+
+#### Limit Count 
+The `limit-count` plugin uses a fixed window algorithm to limit the rate of requests by the number of requests within a given time interval. Requests exceeding the configured quota will be rejected.
+
+- Configuration
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "<route-id>",
+    "uri": "/<uri>",
+    "plugins": {
+      "limit-count": {
+        "count": 1,
+        "time_window": 30,
+        "rejected_code": 429,
+        "key_type": "var",
+        "key": "remote_addr",
+        "policy": "local"
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "<upstream-server>": 1
+      }
+    }
+  }'
+```
+- Result
+If you use `limit-count`, then client will have quota to request. They won't be able to request for several times if they reached its limit
+![Limit Count Result](./documentation/20260820/limit-count-result.png)
+
+#### Proxy Cache
+The `proxy-cache` Plugin provides the capability to cache responses based on a cache key. The Plugin supports both disk-based and memory-based caching options to cache for *GET*, *POST*, and *HEAD* requests.
+
+- Configuration
+1. Customize the corresponding configuration in `config.yaml`. Here's the example
+
+2. Create config for its routes
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "<route-id>",
+    "uri": "/<uri>",
+    "plugins": {
+      "proxy-cache": {
+        "cache_strategy": "disk"
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "<upstream-server>": 1
+      }
+    }
+  }'
+```
+- Test
+1. First Test
+No cache
+![Proxy Cache Test 1](./documentation/20260820/proxy-cache-test-1.png)
+
+2. Second Test
+Valid cache
+![Proxy Cache Test 2](./documentation/20260820/proxy-cache-test-2.png)
+
+3. Third Test
+Expired cache
+![Proxy Cache Test 3](./documentation/20260820/proxy-cache-test-3.png)

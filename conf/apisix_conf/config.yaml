@@ -23,6 +23,21 @@ apisix:
   control:
     ip: "0.0.0.0"
     port: 9092
+  proxy_cache:
+    cache_ttl: 10s
+    zones:
+      - name: disk_cache_one
+        memory_size: 50m
+        disk_size: 1G
+        disk_path: /tmp/disk_cache_one
+        cache_levels: 1:2
+      # - name: disk_cache_two
+      #   memory_size: 50m
+      #   disk_size: 1G
+      #   disk_path: "/tmp/disk_cache_two"
+      #   cache_levels: "1:2"
+      - name: memory_cache
+        memory_size: 50m
 
 deployment:
   admin:
@@ -72,3 +87,16 @@ plugins:
   - uri-blocker
   - ip-restriction
   - ua-restriction
+  - referer-restriction
+  - consumer-restriction
+  # you may use it to combine with consumer-restriction plugin
+  # - key-auth
+  # - jwt-auth
+  - csrf
+
+  - limit-req
+  - limit-conn
+  - limit-count
+  - proxy-cache
+  - request-validation
+  - proxy-mirror
