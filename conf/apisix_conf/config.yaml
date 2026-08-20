@@ -65,3 +65,10 @@ plugins:
   - proxy-rewrite
   - grpc-transcode
   - grpc-web
+
+  - fault-injection
+  - mocking
+  - cors
+  - uri-blocker
+  - ip-restriction
+  - ua-restriction

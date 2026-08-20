@@ -1,0 +1,18 @@
+{
+  "name": "proto_conf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "hello_grpc_web_pb.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "google-protobuf": "^4.0.2",
+    "grpc-web": "^2.0.2",
+    "xhr2": "^0.2.1"
+  }
+}

@@ -218,4 +218,437 @@ With this Plugin enabled, APISIX accepts an HTTP request from the client, transc
 ![gRPC Transcode Result](./documentation/20260819/grpc-transcode-result.png)
 
 #### gRPC Web
-gRPC is a high-performance RPC framework based on HTTP/2 and Protocol Buffers, but it is not natively supported by browsers. gRPC-Web defines a browser-compatible protocol for sending gRPC requests over HTTP/1.1 or HTTP/2.
+gRPC is a high-performance RPC framework based on HTTP/2 and Protocol Buffers, but it is not natively supported by browsers. gRPC-Web defines at browser-compatible protocol for sending gRPC requests over HTTP/1.1 or HTTP/2.
+
+## 20th August 2026
+Continue reviewing plugins. The main focus are : gRPC Web, Fault Injection, Mocking, Cors, URI blocker, IP Restriction, and UA Restriction.
+
+### gRPC Web
+#### Configuration
+1. Create routes
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes/grpc-web-route" -H "X-API-KEY: $admin_key" -X PUT -d '
+{
+  "uri": "/grpc/web/*",
+  "plugins": {
+    "grpc-web": {}
+  },
+  "upstream": {
+    "scheme": "grpc",
+    "type": "roundrobin",
+    "nodes": {
+      "172.17.0.1:9000": 1
+    }
+  }
+}'
+```
+![grpc-web-config](./documentation/20260820/grpc-web-config.png)
+2. Make sure to install requirement tools
+Tools :
+- protobuf
+- protoc-gen-grpc-web
+- protoc-gen-js
+- nodejs
+
+If you use Nixos, you may do this command to installed it temporary :
+```bash
+cd conf/
+nix-shell
+```
+
+3. Generate gRPC-Web Client Code
+```bash
+curl -O https://raw.githubusercontent.com/moul/pb/master/hello/hello.proto
+protoc \
+  --js_out=import_style=commonjs:. \
+  --grpc-web_out=import_style=commonjs,mode=grpcwebtext:. \
+  hello.proto
+```
+
+4. Create a Client (`client.js`)
+- Run it first
+
+```bash
+npm init -y
+npm install xhr2 grpc-web google-protobuf
+```
+- Create `client.js`
+Create it in the same directory with hello.proto
+
+```bash
+const XMLHttpRequest = require('xhr2');
+const { HelloServiceClient } = require('./hello_grpc_web_pb');
+const { HelloRequest } = require('./hello_pb');
+
+global.XMLHttpRequest = XMLHttpRequest;
+
+function sayHello(){
+  const client = new HelloServiceClient('http://127.0.0.1:9080/grpc/web', null, {
+    format: 'text',
+  });
+  const req = new HelloRequest();
+  req.setGreeting('jack');
+
+  const call = client.sayHello(req, {}, (err, resp) => {
+    if (err) {
+      console.error('grpc error:', err.code, err.message);
+    } else {
+      console.log('reply:', resp.getReply());
+    }
+  });
+
+  call.on('metadata', (metadata) => {
+    console.log('Response headers:', metadata);
+  });
+}
+
+function lotsOfReplies() {
+  const client = new HelloServiceClient('http://127.0.0.1:9080/grpc/web', null, {
+    format: 'text',
+  });
+  const req = new HelloRequest();
+  req.setGreeting('rep');
+  const stream = client.lotsOfReplies(req, {});
+
+  stream.on('metadata', (metadata) => {
+    console.log('Response headers:', metadata);
+  });
+
+  stream.on('data', (response) => {
+    console.log('Reply:', response.getReply());
+  });
+
+  stream.on('end', () => {
+    console.log('Stream ended');
+  });
+
+  stream.on('error', (err) => {
+    console.error('Error:', err);
+  });
+}
+
+lotsOfReplies()
+sayHello()
+```
+
+#### Testing
+1. Make sure gRPC bin Active
+![gRPC Bin Active](./documentation/20260820/grpcbin.png)
+2. Run `client.js`
+```bash
+node client.js
+```
+3. Result
+![gRPC Web Result](./documentation/20260820/grpc-web-result.png)
+
+### Fault Injection
+The plugin you should know if want to debugging. This plugin helps us to simulate error, high latency, test fallback, etc. It executes before other configured Plugins, ensuring that faults are applied consistently. This makes it ideal for scenarios like chaos engineering, where the behavior of your system under failure conditions is analyzed.
+
+#### Simple Configuration and Its Test
+1. Inject Faults
+Configuration to create an error without any condition.
+- Config
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT   -H "X-API-KEY: ${admin_key}"   -d '{
+    "id": "fault-injection-route",
+    "uri": "/anything",
+    "plugins": {
+      "fault-injection": {
+        "abort": {
+          "http_status": 404,
+          "body": "APISIX Fault Injection"
+        }
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "httpbin.org:80": 1
+      }
+    }
+  }'
+```
+- Test
+![Injects Fault](./documentation/20260820/fault-inject-config-1.png)
+
+2. Inject Latencies
+To lating the test
+- Config
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "fault-injection-route",
+    "uri": "/anything",
+    "plugins": {
+      "fault-injection": {
+        "delay": {
+          "duration": 3
+        }
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "httpbin.org:80": 1
+      }
+    }
+  }'
+```
+- Test
+![Injects Latencies](./documentation/20260820/fault-inject-config-2.png)
+
+3. Inject Faults Conditionally 
+Configuration to create an error with one or many conditions.
+- Config
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "fault-injection-route",
+    "uri": "/anything",
+    "plugins": {
+      "fault-injection": {
+        "abort": {
+          "http_status": 404,
+          "body": "APISIX Fault Injection",
+          "headers": {
+            "X-APISIX-Remote-Addr": "$remote_addr"
+          },
+          "vars": [
+            [
+              [ "arg_name","==","john" ]
+            ]
+          ]
+        }
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "httpbin.org:80": 1
+      }
+    }
+  }'
+```
+- Test
+![Injects Faults Conditionally](./documentation/20260820/fault-inject-config-2.png)
+
+### Mocking
+API Mocking (`mocking`), Plugin allows you to simulate API responses without forwarding requests to Upstream services. The Plugin supports customization of the response status code, body, headers, and more. This is particularly useful during development, testing, or debugging phases, where the actual Upstream service might be unavailable, under maintenance, or expensive to call.
+
+#### Configuration and Test
+1. Simple Response
+- Config
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "mocking-route",
+    "uri": "/anything",
+    "plugins": {
+      "mocking": {
+        "response_status": 201,
+        "response_example": "{\"Lastname\":\"Brown\",\"Age\":56}"
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "httpbin.org:80": 1
+      }
+    }
+  }'
+```
+- Test
+![Mocking Simple](./documentation/20260820/mocking-simple-response.png)
+2. JSON Response
+- Config
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "mocking-route",
+    "uri": "/anything",
+    "plugins": {
+      "mocking": {
+        "response_schema": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string",
+              "example": "abcd"
+            },
+            "ip": {
+              "type": "number",
+              "example": 192.168
+            },
+            "random_str_arr": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "nested_obj": {
+              "type": "object",
+              "properties": {
+                "random_str": {
+                  "type": "string"
+                },
+                "child_nested_obj": {
+                  "type": "object",
+                  "properties": {
+                    "random_bool": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "random_int_arr": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "example": 155
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "httpbin.org:80": 1
+      }
+    }
+  }'
+```
+- Test
+![Mocking JSON Response](./documentation/20260820/mocking-object-resp.png)
+
+### Security Plugins
+
+#### Cors
+The `cors` plugin allows you to enable Cross-Origin Resource Sharing (CORS). CORS is an HTTP-header based mechanism which allows a server to specify any origins (domain, scheme, or port) other than its own, and instructs browsers to allow the loading of resources from those origins.
+- Configuration
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT   -H "X-API-KEY: ${admin_key}"   -d '{
+    "id": "cors-route",
+    "uri": "/cors",
+    "plugins": {
+      "cors": {
+        "allow_origins": "http://sub.domain.com,http://sub2.domain.com",
+        "allow_methods": "GET,POST",
+        "allow_headers": "headr1,headr2",
+        "expose_headers": "ex-headr1,ex-headr2",
+        "max_age": 50,
+        "allow_credential": true
+      }
+    },
+    "upstream": {
+      "nodes": {
+        "httpbin.org:80": 1
+      },
+      "type": "roundrobin"
+    }
+  }'
+```
+- Test
+Without Origin Header
+![Cors Without Origin](./documentation/20260820/cors-test-without-origin.png)
+With Origin Header
+![Cors With Origin](./documentation/20260820/cors-test-with-origin.png)
+
+#### URI Blocker
+The `uri-blocker` plugin intercepts user requests with a set of `block_rules`. It's using blacklist mechanism. Will be helpfull if there's some URI that doesn't want to be public
+
+- Configuration
+```bash
+curl -i http://127.0.0.1:9180/apisix/admin/routes/1 -H "X-API-KEY: $admin_key" -X PUT -d '
+{
+    "uri": "/*",
+    "plugins": {
+        "uri-blocker": {
+            "block_rules": ["root.exe", "root.m+"]
+        }
+    },
+    "upstream": {
+        "type": "roundrobin",
+        "nodes": {
+            "127.0.0.1:1980": 1
+        }
+    }
+}'
+```
+- Test
+![URI Blocker Test Result](./documentation/20260820/uri-blocker-result.png)
+
+#### IP Restriction
+The `ip-restriction` plugin supports restricting access to Upstream resources by IP addresses, through either configuring a whitelist or blacklist of IP addresses. Restricting IP to resources helps prevent unauthorized access and harden API security.
+
+- Configuration
+You may choose between *whitelist* or *blaclist* option
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "ip-restriction-route",
+    "uri": "/ip-restrict",
+    "plugins": {
+      "ip-restriction": {
+        "whitelist": [
+          "192.168.0.1/24"
+        ],
+        "message": "Access denied"
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "httpbin.org:80": 1
+      }
+    }
+  }'
+```
+- Test
+Before
+![Before IP Restriction](./documentation/20260820/ip-restrict-before.png)
+
+After
+![After IP Restriction](./documentation/20260820/ip-restrict-after.png)
+
+#### UA Restriction
+The `ua-restriction` plugin supports restricting access to upstream resources through either configuring an allowlist or denylist of user agents. A common use case is to prevent web crawlers from overloading the upstream resources and causing service degradation.
+
+- Configuration
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT   -H "X-API-KEY: ${admin_key}"   -d '{
+    "id": "ua-restriction-route",
+    "uri": "/ua-res",
+    "plugins": {
+      "ua-restriction": {
+        "bypass_missing": false,
+        "denylist": [
+          "(Baiduspider)/(\\d+)\\.(\\d+)",
+          "bad-bot-1"
+        ],
+        "message": "Access denied"
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "web2:80": 1
+      }
+    }
+  }'
+```
+- Test
+Non Forbidden Agent
+![Non Forbidden Result](./documentation/20260820/ua-res-noblock.png)
+
+Forbidden Agent
+![Forbidden Agent Result](./documentation/20260820/ua-res-block.png)
+

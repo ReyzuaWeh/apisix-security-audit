@@ -3,3 +3,4 @@
 *.key*
 *.srl*
 apisix-docker/
+node_modules/
