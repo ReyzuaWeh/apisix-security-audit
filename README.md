@@ -85,6 +85,7 @@ curl http://127.0.0.1:9180/apisix/admin/routes/br -H "X-API-KEY: $admin_key" -X 
 }'
 ```
 - Result
+
 ![Batch Requests Test](documentation/20260815/batch-requests-test.png)
 
 [Source documentation](https://apisix.apache.org/docs/apisix/plugins/batch-requests/)
@@ -139,7 +140,8 @@ curl "http://127.0.0.1:9180/apisix/admin/routes/real-ip-route" \
 ```
 - Config
 ![Real IP Debug Config](./documentation/20260818/real-ip-debug-config.png)
-- Testing
+- Result
+ing
 ![Real IP Debug Test](./documentation/20260818/real-ip-debug-test.png)
 
 ### Server Info
@@ -221,7 +223,7 @@ With this Plugin enabled, APISIX accepts an HTTP request from the client, transc
 gRPC is a high-performance RPC framework based on HTTP/2 and Protocol Buffers, but it is not natively supported by browsers. gRPC-Web defines at browser-compatible protocol for sending gRPC requests over HTTP/1.1 or HTTP/2.
 
 ## 20th August 2026
-Continue reviewing plugins. The main focus are : gRPC Web, Fault Injection, Mocking, Security Plugins, abd Traffic Plugins.
+Continue reviewing plugins. The main focus are : gRPC Web, Fault Injection, Mocking, Security Plugins, and Traffic Plugins.
 
 ### gRPC Web
 #### Configuration
@@ -312,7 +314,8 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT   -H "X-API-KEY: ${admin
     }
   }'
 ```
-- Test
+- Result
+
 ![Injects Fault](./documentation/20260820/fault-inject-config-1.png)
 
 2. Inject Latencies
@@ -339,7 +342,8 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
     }
   }'
 ```
-- Test
+- Result
+
 ![Injects Latencies](./documentation/20260820/fault-inject-config-2.png)
 
 3. Inject Faults Conditionally 
@@ -375,7 +379,8 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
     }
   }'
 ```
-- Test
+- Result
+
 ![Injects Faults Conditionally](./documentation/20260820/fault-inject-config-2.png)
 
 ### Mocking
@@ -404,8 +409,10 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
     }
   }'
 ```
-- Test
+- Result
+
 ![Mocking Simple](./documentation/20260820/mocking-simple-response.png)
+
 2. JSON Response
 - Config
 ```bash
@@ -469,7 +476,8 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
     }
   }'
 ```
-- Test
+- Result
+
 ![Mocking JSON Response](./documentation/20260820/mocking-object-resp.png)
 
 ### Security Plugins
@@ -499,7 +507,8 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT   -H "X-API-KEY: ${admin
     }
   }'
 ```
-- Test
+- Result
+
 Without Origin Header
 ![Cors Without Origin](./documentation/20260820/cors-test-without-origin.png)
 With Origin Header
@@ -526,7 +535,8 @@ curl -i http://127.0.0.1:9180/apisix/admin/routes/1 -H "X-API-KEY: $admin_key" -
     }
 }'
 ```
-- Test
+- Result
+
 ![URI Blocker Test Result](./documentation/20260820/uri-blocker-result.png)
 
 #### IP Restriction
@@ -556,11 +566,14 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
     }
   }'
 ```
-- Test
+- Result
+
 Before
+
 ![Before IP Restriction](./documentation/20260820/ip-restrict-before.png)
 
 After
+
 ![After IP Restriction](./documentation/20260820/ip-restrict-after.png)
 
 #### UA Restriction
@@ -589,11 +602,14 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT   -H "X-API-KEY: ${admin
     }
   }'
 ```
-- Test
+- Result
+
 Non Forbidden Agent
+
 ![Non Forbidden Result](./documentation/20260820/ua-res-noblock.png)
 
 Forbidden Agent
+
 ![Forbidden Agent Result](./documentation/20260820/ua-res-block.png)
 
 #### Referer Restriction
@@ -620,11 +636,14 @@ curl http://127.0.0.1:9180/apisix/admin/routes/1 -H "X-API-KEY: $admin_key" -X P
     }
 }'
 ```
-- Test
+- Result
+
 Allowed Referer
+
 ![Allowed Result](./documentation/20260820/referer-allow.png)
 
 Not-Allowed Referer
+
 ![Not-Allowed Result](./documentation/20260820/referer-not-allow.png)
 
 #### Consumer Restriction
@@ -672,11 +691,14 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT   -H "X-API-KEY: ${admin
   }'
 ```
 
-- Test
+- Result
+
 Allowed Consumer
+
 ![Allowed Consumer](./documentation/20260820/consumer-allow.png)
 
 Not-Allowed Consumer
+
 ![Not-Allowed Consumer](./documentation/20260820/consumer-not-allow.png)
 
 #### CSRF 
@@ -708,7 +730,8 @@ curl -i http://127.0.0.1:9080/<uri>
 ```
 ![Get CSRF](./documentation/20260820/csrf-get.png)
 
-- Test
+- Result
+
 ![No CSRF Post](./documentation/20260820/csrf-no-csrf.png)
 
 
@@ -745,6 +768,7 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
   }'
 ```
 - Result
+
 ![Req Limit Result](./documentation/20260820/req-limit-result.png)
 
 #### Limit Conn
@@ -777,6 +801,7 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
   }'
 ```
 - Result
+
 ![Limit Conn Result](./documentation/20260820/limit-conn-result.png)
 
 #### Limit Count 
@@ -808,6 +833,7 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
   }'
 ```
 - Result
+
 If you use `limit-count`, then client will have quota to request. They won't be able to request for several times if they reached its limit
 ![Limit Count Result](./documentation/20260820/limit-count-result.png)
 
@@ -837,15 +863,455 @@ curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
     }
   }'
 ```
-- Test
+- Result
+
 1. First Test
 No cache
+
 ![Proxy Cache Test 1](./documentation/20260820/proxy-cache-test-1.png)
 
 2. Second Test
 Valid cache
+
 ![Proxy Cache Test 2](./documentation/20260820/proxy-cache-test-2.png)
 
 3. Third Test
 Expired cache
+
 ![Proxy Cache Test 3](./documentation/20260820/proxy-cache-test-3.png)
+
+## 22nd August 2026
+Continue reviewing plugins. The main focus is the rest of Traffic Plugins. 
+
+### Traffic Plugins
+#### Request Validation
+The `request-validation` Plugin validates requests before forwarding them to Upstream services. This Plugin uses **JSON Schema** for validation and can validate headers and body of a request.
+
+- Configuration
+1. Header Validation
+
+Edit `header_schema` attribute
+
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "<route-id>",
+    "uri": "/<uri>",
+    "plugins": {
+      "request-validation": {
+        "header_schema": {
+          "type": "object",
+          "required": ["User-Agent", "Host"],
+          "properties": {
+            "User-Agent": {
+              "type": "string",
+              "pattern": "^curl\/"
+            },
+            "Host": {
+              "type": "string",
+              "enum": ["httpbin.org", "httpbin"]
+            }
+          }
+        }
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "httpbin.org:80": 1
+      }
+    }
+  }'
+```
+
+2. Customize Rejection Message and Status Code
+
+Edit `rejected_code` and `rejected_msg` attribute.
+
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "<route-id>",
+    "uri": "/<uri>",
+    "plugins": {
+      "request-validation": {
+        "header_schema": {
+          "type": "object",
+          "required": ["Host"],
+          "properties": {
+            "Host": {
+              "type": "string",
+              "enum": ["httpbin.org", "httpbin"]
+            }
+          }
+        },
+        "rejected_code": 403,
+        "rejected_msg": "Request header validation failed."
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "httpbin.org:80": 1
+      }
+    }
+  }'
+```
+
+3. Body Validation
+
+Edit `body_schema` attribute.
+
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "<route-id>",
+    "uri": "/<uri>",
+    "plugins": {
+      "request-validation": {
+        "header_schema": {
+          "type": "object",
+          "required": ["Content-Type"],
+          "properties": {
+            "Content-Type": {
+            "type": "string",
+            "pattern": "^application\/json$"
+            }
+          }
+        },
+        "body_schema": {
+          "type": "object",
+          "required": ["required_payload"],
+          "properties": {
+            "required_payload": {"type": "string"},
+            "boolean_payload": {"type": "boolean"},
+            "array_payload": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "integer",
+                "minimum": 200,
+                "maximum": 599
+              },
+              "uniqueItems": true,
+              "default": [200]
+            }
+          }
+        }
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "httpbin.org:80": 1
+      }
+    }
+  }'
+```
+
+- Result
+1. Header Validation
+
+![Request Header Validation Test](./documentation/20260822/req-valid-head.png)
+
+2. Custom Message and Code
+
+![Request Validation Custom Message and Code](./documentation/20260822/req-valid-msg.png)
+
+3. Body Validation
+
+![Request Body Validation Test](./documentation/20260822/req-valid-body.png)
+
+
+#### Proxy Mirror
+The `proxy-mirror` plugin duplicates ingress traffic to APISIX and forwards them to a designated upstream, without interrupting the regular services. You can configure the plugin to mirror all traffic or only a portion. The mechanism benefits a few use cases, including troubleshooting, security inspection, analytics, and more.
+
+- Configuration
+
+1. Static configuration
+
+By default, timeout values for the plugin are pre-configured in the **default configuration**.
+
+To customize these values, add the corresponding configurations to `config.yaml`. For example:
+```bash
+plugin_attr:
+  proxy-mirror:
+    timeout:
+      connect: 60s
+      read: 60s
+      send: 60s
+```
+
+
+2. Route configuration
+
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "<route-id>",
+    "uri": "/<uri>",
+    "plugins": {
+      "proxy-mirror": {
+        "host": "<your-mirror-service>",
+        "sample_ratio": 0.5
+      }
+    },
+    "upstream": {
+      "nodes": {
+        "httpbin.org": 1
+      },
+      "type": "roundrobin"
+    }
+  }'
+```
+
+- Result
+
+This suggests APISIX has mirrored the request to the NGINX server. Here, the HTTP response status is 404 since the sample NGINX server does not implement the Route.
+
+![Result of Using Proxy Mirror](./documentation/20260822/proxy-mirror-result.png)
+
+
+#### API Breaker
+The `api-breaker` Plugin implements circuit breaker functionality to protect Upstream services. Would be usefull if our backend services suddenly error, this plugin will be handle the client to not reach the backend before it's fixed.
+
+- Configuration
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes/<route-id>" \
+-H "X-API-KEY: $admin_key" -X PUT -d '
+{
+    "plugins": {
+        "api-breaker": {
+            "break_response_code": 502,
+            "unhealthy": {
+                "http_statuses": [500, 503],
+                "failures": 3
+            },
+            "healthy": {
+                "http_statuses": [200],
+                "successes": 1
+            }
+        }
+    },
+    "upstream": {
+        "type": "roundrobin",
+        "nodes": {
+            "<upstream-service>": 1
+        }
+    },
+    "uri": "/<uri>"
+}'
+```
+
+- Result
+
+After 3 times result of error, it'll be 502
+
+![API Breaker Active](./documentation/20260822/api-breaker-active.png)
+
+#### Traffic Split
+The `traffic-split` Plugin directs traffic to various Upstream services based on conditions and/or weights. It provides a dynamic and flexible approach to implement release strategies and manage traffic. The difference between this and `load balancer` is this plugin doesn't have to share same weights or conditions. Can be used for a **Blue-Green Deployment** and **Canary Developmen**
+
+##### Configuration
+1. Canary Deployment Configuration
+
+Weight based split configuration
+
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "uri": "/<uri>",
+    "id": "<route-id>",
+    "plugins": {
+      "traffic-split": {
+        "rules": [
+          {
+            "weighted_upstreams": [
+              {
+                "upstream": {
+                  "type": "roundrobin",
+                  "scheme": "https",
+                  "pass_host": "node",
+                  "nodes": {
+                    "<second-service>":1
+                  }
+                },
+                "weight": 3
+              },
+              {
+                "weight": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "scheme": "https",
+      "pass_host": "node",
+      "nodes": {
+        "<first-service>":1
+      }
+    }
+  }'
+```
+
+2. Blue-Green Deployment Configuration
+
+Condition based split configuration
+
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "uri": "/<uri>>",
+    "id": "<route-id>",
+    "plugins": {
+      "traffic-split": {
+        "rules": [
+          {
+            "match": [
+              {
+                "vars": [
+                  ["http_release","==","new_release"]
+                ]
+              }
+            ],
+            "weighted_upstreams": [
+              {
+                "upstream": {
+                  "type": "roundrobin",
+                  "scheme": "https",
+                  "pass_host": "node",
+                  "nodes": {
+                    "<second-service>":1
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "scheme": "https",
+      "pass_host": "node",
+      "nodes": {
+        "<first-service>":1
+      }
+    }
+  }'
+```
+
+##### Test
+1. Canary Deployment Configuration
+
+![Traffic Split CD Result](./documentation/20260822/traffic-split-canary-result.png)
+
+2. Blue-Green Deployment Configuration
+
+![Traffic Split CD Result](./documentation/20260822/traffic-split-bg-result.png)
+
+#### Request ID
+The `request-id` Plugin assigns a unique ID to each request proxied through the gateway, which can be used for request tracking and debugging. If a request already includes an ID in the header specified by header_name and the value is not empty (""), the plugin uses that value as the request ID. Otherwise, it generates a new one and does not overwrite a valid existing ID
+
+- Configuration
+
+```bash
+curl "http://127.0.0.1:9180/apisix/admin/routes" -X PUT \
+  -H "X-API-KEY: ${admin_key}" \
+  -d '{
+    "id": "<route-id>",
+    "uri": "/<uri>",
+    "plugins": {
+      "request-id": {
+        "header_name": "X-Request-Id",
+        "include_in_response": true,
+        "algorithm": "uuid"
+      }
+    },
+    "upstream": {
+      "type": "roundrobin",
+      "nodes": {
+        "<upstream-service>": 1
+      }
+    }
+  }'
+```
+
+- Result
+
+![Request ID Result](./documentation/20260822/request-id-result.png)
+
+#### Proxy Control
+The `proxy-control` Plugin dynamically controls the behavior of the NGINX proxy, especially to controll its request wheter continue to upstream or not.
+
+- Configuration
+
+```bash
+curl -i http://127.0.0.1:9180/apisix/admin/routes/<route-id> -H "X-API-KEY: $admin_key" \ 
+  -X PUT -d '
+{
+    "uri": "/<uri>",
+    "plugins": {
+        "proxy-control": {
+            "request_buffering": false
+        }
+    },
+    "upstream": {
+        "type": "roundrobin",
+        "nodes": {
+            "<upstream-service>": 1
+        }
+    }
+}'
+```
+- Result
+
+Test command
+```bash
+curl -i http://127.0.0.1:9080/uri -d @<very-big-file>
+```
+
+Before
+
+![Before Proxy Conrol](./documentation/20260822/proxy-control-before.png)
+
+After
+
+![After Proxy Control](/documentation/20260822/proxy-control-after.png)
+
+#### Client Control
+The `client-control` Plugin can be used to dynamically control the behavior of NGINX to handle a client request, by setting the max size of the request body.
+
+- Configuration
+
+```bash
+curl -i http://127.0.0.1:9180/apisix/admin/routes/<route-id> \ 
+  -H "X-API-KEY: $admin_key" -X PUT -d '
+{
+    "uri": "/<uri>",
+    "plugins": {
+        "client-control": {
+            "max_body_size" : 1
+        }
+    },
+    "upstream": {
+        "type": "roundrobin",
+        "nodes": {
+            "<upstream-service>": 1
+        }
+    }
+}'
+```
+
+- Result
+
+![Client Control Result](./documentation/20260822/client-control-result.png)

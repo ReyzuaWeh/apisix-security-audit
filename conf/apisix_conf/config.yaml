@@ -30,7 +30,7 @@ apisix:
         memory_size: 50m
         disk_size: 1G
         disk_path: /tmp/disk_cache_one
-        cache_levels: 1:2
+        cache_levels: "1:2"
       # - name: disk_cache_two
       #   memory_size: 50m
       #   disk_size: 1G
@@ -66,6 +66,11 @@ plugin_attr:
       port: 9091
   server-info:
     report_ttl: 60
+  proxy-mirror:
+    timeout:
+      connect: 60s
+      read: 60s
+      send: 60s
 plugins:
   - batch-requests
   - public-api
@@ -100,3 +105,8 @@ plugins:
   - proxy-cache
   - request-validation
   - proxy-mirror
+  - api-breaker
+  - traffic-split
+  - request-id
+  - proxy-control
+  - client-control
