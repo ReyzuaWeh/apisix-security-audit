@@ -71,6 +71,11 @@ plugin_attr:
       connect: 60s
       read: 60s
       send: 60s
+  log-rotate:
+    interval: 3600
+    max_kept: 168
+    max_size: -1
+    enable_compression: false 
 plugins:
   - batch-requests
   - public-api
@@ -110,3 +115,14 @@ plugins:
   - request-id
   - proxy-control
   - client-control
+
+  - prometheus
+  - http-logger
+  - tcp-logger
+  - kafka-logger
+  - clickhouse-logger
+  - syslog
+  - log-rotate
+
+  - serverless-pre-function
+  - serverless-post-function
