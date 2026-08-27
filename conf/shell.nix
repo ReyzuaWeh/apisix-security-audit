@@ -1,11 +1,15 @@
 { pkgs ? import <nixpkgs> {} }:
 
 pkgs.mkShell {
-  buildInputs = [
-    pkgs.protobuf
-    pkgs.protoc-gen-grpc-web
-    pkgs.protoc-gen-js
-    pkgs.nodejs-slim
+  buildInputs = with pkgs; [
+    protobuf
+    protoc-gen-grpc-web
+    protoc-gen-js
+    nodejs-slim
+
+    # auto tls
+    acme-sh
+    curl
   ];
 
   shellHook = ''
