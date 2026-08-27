@@ -20,7 +20,7 @@ This document summarizes the daily progress of the APISIX API Gateway configurat
 | 22 August 2026 | Plugin review (continued): Request Validation, Proxy Mirror, API Breaker, Traffic Split, Request ID, Proxy Control, Client Control | [Traffic](./reviews/04-traffic.md) |
 | 25 August 2026 | Plugin review: Prometheus, HTTP/TCP/Kafka Logger, Syslog, Clickhouse Logger, Log Rotate | [Observability](./reviews/05-observability.md) |
 | 25 August 2026 | Plugin review: Serverless Pre/Post Function | [Serverless](./reviews/06-serverless.md) |
-|27 August 2025 | Reformating documentation and create Auto TLS Configuration  | [Auto-TLS](./auto-tls/README.md) |
+|27 August 2025 | Reformating documentation, create Auto TLS Configuration, and information some of Common Missconfiguration  | [Auto-TLS](./auto-tls/README.md) and [Missconfiguration](./reviews/07-misconfiguration-security.md) |
 
 ## Category Reference
 
